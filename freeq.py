@@ -6,6 +6,10 @@ import sys
 import os
 import argparse
 from collections import Counter
+from nltk.corpus import stopwords
+import nltk
+
+nltk.download("stopwords")
 
 __all__ = ['WordFinder', 'Book']
 
@@ -144,28 +148,18 @@ class Book(object):
 
 
 if __name__ == '__main__':
-    if sys.platform == 'nt':
-        sys.stderr.write("I haven't tested the code on Windows. Feedback is welcome.\n")
-
-    LINE_SEP = os.linesep
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input', dest='input_file')
-    parser.add_argument('-o', '--output', dest='output_file')
-    args = parser.parse_args()
-
-    book = Book(args.input_file)
-    result = book.freq()
-    # Maximum width of the ocurrence column
-    max_width = max(len(str(v)) for v in result.values())
-
-    report = []
-    for word in sorted(result, key=lambda x: result[x], reverse=True):
-        report.append('{:>{}} {}'.format(result[word], max_width, word))
-
-    if args.output_file:
-        with open(args.output_file, 'w') as output:
-            output.write(LINE_SEP.join(report))
-            output.write(LINE_SEP)
-    else:
-        print(LINE_SEP.join(report))
+    for name in sorted(os.listdir('../dump')):
+        path = os.path.join('../dump', name)
+        book = Book(path)
+        result = book.freq()
+        # Maximum width of the ocurrence column
+        # max_width = max(len(str(v)) for v in result.values())
+        report = pd.DataFrame(columns=['word', 'frequency'])
+        stopWords = set(stopwords.words('english'))
+        for word in sorted(result, key=lambda x: result[x], reverse=True):
+            if word not in stopWords:
+                s1 = pd.DataFrame([[word, result[word]]], columns=['word', 'frequency'])
+                report = report.append(s1, ignore_index=True)
+        filename = '../output/{}_result.csv'.format(name.split('.')[0])
+        print(filename)
+        report.to_csv(filename, encoding='utf-8', index=False, sep=',')
