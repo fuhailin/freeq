@@ -1,3 +1,15 @@
+# wordscounter
+English words term frequency counter 
+
+
+## 1 Read English sentences from files 
+
+## 2 Split sentences to words 
+
+## 3 Normalize different forms words as the same (like: is, are, was, were)
+
+## 4 Remove stop words use NLTK
+
 Requirements
 ============
 Python 3.4+
